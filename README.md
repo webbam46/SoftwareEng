@@ -1,4 +1,5 @@
 # Software Engineering Assignment
+Each SPRINT will exists as a seperate branch in the repository
 
 ##SPRINT01
 ###Roles
