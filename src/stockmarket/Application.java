@@ -25,8 +25,11 @@ public class Application {
 		
 		try {
 			Client c = new Client("127.0.0.1",5000);
-			c.Write("HELO");
-			c.Write("EXIT");
+			
+			for(int i = 0; i < 5;i++)
+			{
+				c.Write("HELO");
+			}
 			
 		} catch (IOException e) {
 			// TODO Auto-generated catch block

@@ -7,6 +7,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
+import java.util.ArrayList;
 
 /**
  * Client class
@@ -16,9 +17,9 @@ import java.net.Socket;
 public class Client extends Socket{
 	
 	
-	//Handles data input
-	PrintWriter out;
 	//Handles data output
+	Sender out;
+	//Handles data input
 	Receiver in; //Data in
 	
 	
@@ -34,8 +35,9 @@ public class Client extends Socket{
 	public Client(String ip,int port) throws IOException{ 
 		super(ip,port);
 		//Initialise output
-		out = new PrintWriter(this.getOutputStream(),true);
-		
+		out = new Sender(this);
+		//Start the sender thread
+		out.start();
 		//Initialise the receiver
 		in = new Receiver(this);
 		//Start the receiver thread
@@ -43,9 +45,73 @@ public class Client extends Socket{
 	
 	}
 	
+	/**
+	 * Write some data to the server
+	 * @param string
+	 */
+	public void Write(String string){ out.Send(string); }
 	
-	public void Write(String string){ out.println(string); }
-
+	/**
+	 * Data sender class
+	 * @author Adam
+	 *
+	 */
+	public class Sender extends Thread
+	{
+		//Writer
+		PrintWriter out;
+		
+		//Data
+		ArrayList<String> data;
+		
+		/**
+		 * Main constructor
+		 * @param client
+		 */
+		public Sender(Client client)
+		{
+			try
+			{
+				out = new PrintWriter(client.getOutputStream(),true);
+				data = new ArrayList<String>();
+			}catch(Exception e){ System.out.println(e.getMessage()); }
+		}
+		
+		/**
+		 * Send some data
+		 * @param _data
+		 */
+		public void Send(String _data)
+		{
+			//Add it to the queue
+			data.add(_data);
+		}
+		
+		/*
+		 * The main run method
+		 * (non-Javadoc)
+		 * @see java.lang.Thread#run()
+		 */
+		public void run(){
+			
+			//Keep looping...
+			while(true)
+			{
+				//Is there any data to send?
+				if(!data.isEmpty())
+				{
+					//Cycle through and check for data to send
+					for(int i =0; i < data.size();i++)
+					{
+						//If any - send the data
+						out.println(data.get(i));
+						//We don't need that data in the list anymore - so remove it
+						data.remove(i);
+					}
+				} //Else do nothing, keep checking
+			}
+		}
+	}
 
 	
 	/**

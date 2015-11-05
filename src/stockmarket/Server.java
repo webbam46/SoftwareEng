@@ -64,10 +64,10 @@ public class Server extends Thread
                 
                 String inputText;
                 
-                out.println("ping");
+                
                 
                 while((inputText = in.readLine()) != null)
-                {
+                { out.println("You sent me: " + inputText);
                     System.out.println("Client: " + clientSocket.getLocalSocketAddress() + " : " + inputText);
                     
                     if(inputText.equals("HELO"))
