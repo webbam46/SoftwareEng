@@ -1,5 +1,7 @@
 package stockmarket;
 
+import java.io.IOException;
+
 public class Application {
 
 	public static void main(String[] args) {
@@ -21,26 +23,16 @@ public class Application {
 			}
 		})).start();
 		
-		/*
-		 * The client will be started here
-		 */
-		(new Thread(new Runnable() {
+		try {
+			Client c = new Client("127.0.0.1",5000);
+			c.Write("HELO");
+			c.Write("EXIT");
 			
-			@Override
-			public void run() {
-				// TODO Auto-generated method stub
-				try
-				{
-					Client c = new Client("127.0.0.1",5000);
-					c.Write("HELO");
-					c.Write("EXIT");
-					c.close();
-					
-				}catch(Exception e){ System.out.println(e.getMessage()); }
-				
-				
-			}
-		})).start();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
 
 	}
 

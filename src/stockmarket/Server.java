@@ -61,7 +61,10 @@ public class Server extends Thread
                 in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
                 out = new PrintWriter(clientSocket.getOutputStream(), true);
                 
+                
                 String inputText;
+                
+                out.println("ping");
                 
                 while((inputText = in.readLine()) != null)
                 {
@@ -71,6 +74,7 @@ public class Server extends Thread
                     {
                         System.out.println("ACK:" + clientSocket.getLocalSocketAddress() + ":" + clientSocket.getRemoteSocketAddress());
                         out.println("ACK:" + clientSocket.getLocalSocketAddress() + ":" + clientSocket.getRemoteSocketAddress());
+                        
                     }
                     else if(inputText.equals("EXIT"))
                     {
