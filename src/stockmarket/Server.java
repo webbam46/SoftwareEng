@@ -61,16 +61,20 @@ public class Server extends Thread
                 in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
                 out = new PrintWriter(clientSocket.getOutputStream(), true);
                 
+                
                 String inputText;
                 
+                
+                
                 while((inputText = in.readLine()) != null)
-                {
+                { out.println("You sent me: " + inputText);
                     System.out.println("Client: " + clientSocket.getLocalSocketAddress() + " : " + inputText);
                     
                     if(inputText.equals("HELO"))
                     {
                         System.out.println("ACK:" + clientSocket.getLocalSocketAddress() + ":" + clientSocket.getRemoteSocketAddress());
                         out.println("ACK:" + clientSocket.getLocalSocketAddress() + ":" + clientSocket.getRemoteSocketAddress());
+                        
                     }
                     else if(inputText.equals("EXIT"))
                     {
