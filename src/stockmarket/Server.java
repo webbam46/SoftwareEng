@@ -1,5 +1,4 @@
 package stockmarket;
-
 import java.net.*;
 import java.io.*;
 
@@ -31,7 +30,12 @@ public class Server extends Thread
         }
     }
 
-   
+    public static void main(String [] args)
+    {
+        Server mySTS = new Server();
+        mySTS.initSTS();
+
+    }
 
 
     class ClientConnect extends Thread
