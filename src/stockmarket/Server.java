@@ -9,6 +9,7 @@ public class Server extends Thread
 
     public Server()
     {
+    	initSTS();
     }
 
     public void initSTS()
