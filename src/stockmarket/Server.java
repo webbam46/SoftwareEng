@@ -2,17 +2,25 @@ package stockmarket;
 import java.net.*;
 import java.io.*;
 
-public class Server extends Thread
+public class Server 
 {
 
     protected ServerSocket STSSocket = null;
+    public StockMarket mySM;
 
     public Server()
     {
-    	initSTS();
     }
 
     public void initSTS()
+    {
+        System.out.println("StockMarket thread started.");
+        Thread t1 = new Thread(mySM.getStockMarket());
+        t1.start();
+    }
+
+
+    public void listenForClients()
     {
         try
         {
@@ -20,8 +28,8 @@ public class Server extends Thread
             
             while(true)
             {
-                System.out.println("Listening for connections.\n");
-                new ClientConnect(STSSocket.accept());
+                System.out.println("Listening for connections from Client.\n");
+                new ClientConnect(STSSocket.accept(), mySM);
             }
         }
         catch(IOException e)
@@ -31,73 +39,5 @@ public class Server extends Thread
         }
     }
 
-    public static void main(String [] args)
-    {
-        Server mySTS = new Server();
-        mySTS.initSTS();
-
-    }
-
-
-    class ClientConnect extends Thread
-    {
-        protected Socket clientSocket;
-        protected BufferedReader in = null;
-        protected PrintWriter out = null;
-
-        private ClientConnect(Socket aSocket)
-        {
-            clientSocket = aSocket;
-            start();
-        }
-
-        public void run()
-        {
-            System.out.println("New client has connected, new thread started.\n");
-            System.out.println("Client IP is: " + clientSocket.getRemoteSocketAddress() + "\n\n");
-            
-            try
-            {
-                in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
-                out = new PrintWriter(clientSocket.getOutputStream(), true);
-                
-                
-                String inputText;
-                
-                
-                
-                while((inputText = in.readLine()) != null)
-                { out.println("You sent me: " + inputText);
-                    System.out.println("Client: " + clientSocket.getLocalSocketAddress() + " : " + inputText);
-                    
-                    if(inputText.equals("HELO"))
-                    {
-                        System.out.println("ACK:" + clientSocket.getLocalSocketAddress() + ":" + clientSocket.getRemoteSocketAddress());
-                        out.println("ACK:" + clientSocket.getLocalSocketAddress() + ":" + clientSocket.getRemoteSocketAddress());
-                        
-                    }
-                    else if(inputText.equals("EXIT"))
-                    {
-                        System.out.println("ACK:EXIT:Goodbye!");
-                        break;
-                    }
-                    else
-                    {
-                        System.out.println("DEBUG:"+inputText+":");
-                    }
-                }
-                out.close();
-                in.close();
-
-                clientSocket.close();
-            }
-            catch(IOException e)
-            {
-                System.out.println("Problem with socket: " + e);
-            }
-        }
-
-    }
     
-
 }
