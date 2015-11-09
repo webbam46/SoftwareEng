@@ -16,7 +16,9 @@ public class Application {
 			public void run() {
 				// TODO Auto-generated method stub
 				
-					Server s = new Server();
+				 	Server mySTS = new Server();
+			        mySTS.initSTS();
+			        mySTS.listenForClients();
 					
 					
 				
@@ -25,11 +27,9 @@ public class Application {
 		
 		try {
 			Client c = new Client("127.0.0.1",5000);
-			
-			for(int i = 0; i < 5;i++)
-			{
-				c.Write("HELO");
-			}
+			c.Write("HELP");
+			c.Write("REGI");
+			c.Write("DISP");
 			
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
