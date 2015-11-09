@@ -25,16 +25,10 @@ public class Application {
 			}
 		})).start();
 		
-		try {
-			Client c = new Client("127.0.0.1",5000);
-			c.Write("HELP");
-			c.Write("REGI");
-			c.Write("DISP");
-			
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		//Stock market interface
+		StockMarketInterface stockMarketInt = new StockMarketInterface();
+		//Display
+		stockMarketInt.Display();
 		
 
 	}

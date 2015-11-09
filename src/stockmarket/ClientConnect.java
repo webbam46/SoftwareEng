@@ -64,7 +64,17 @@ class ClientConnect extends Thread
                 {   // Display Stock Market
                     if(isRegistered)
                     {
-                        String [][] aStock = mySMRef.getStockMarketState();
+                    	/**
+                    	 * 
+                    	 *  ERROR FOUND -- State didn't exist - exception was thrown
+                    	 *  Try, catch inserted
+                    	 * 
+                    	 */
+                    	String [][] aStock = null;
+                    	try
+                    	{
+                        aStock = mySMRef.getStockMarketState();
+                    	}catch(Exception e){ }
                         if(aStock!=null)
                         {
                         	//objectOut.writeObject(mySMRef.getStockMarketState());
