@@ -29,3 +29,35 @@ Robert - Role
 - Develop test cases
 - implement multi-threading
 
+
+Sprint 3
+SCRUM Master – Emma Huntley
+SCRUM Members – Adam, Charles, Jordan, Emily, Peter, Robert
+Iteration – Stock Market Interface
+
+Plan:
+ Design stock market interface
+ Implement stock market interface
+ Test
+
+Designated roles:
+Designers – Charles, Peter
+Programmers – Robert, Adam
+Testing - Jordan, Emily
+
+
+Sprint 4
+SCRUM Master – Charles
+SCRUM Members – Adam, Robert , Jordan, Emily, Emma, Peter
+
+Iteration – Implement receiving unique guid
+
+Plan:
+Receive and store unique guid from the server for future use
+Use clean room programing
+
+Designated roles:
+Designers – Emma, Emily
+Programmers – Robert, Jordan
+Testing/Compilers - Adam, Peter
+
