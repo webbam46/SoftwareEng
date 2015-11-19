@@ -1,11 +1,7 @@
 package stockmarket;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.ObjectOutputStream;
-import java.io.PrintWriter;
-import java.net.Socket;
+import java.io.*;
+import java.net.*;
 
 class ClientConnect extends Thread
 {
@@ -17,6 +13,7 @@ class ClientConnect extends Thread
     protected StockMarket mySMRef;
 
     protected boolean isRegistered = false;
+    protected String[] tokens;
 
     public ClientConnect(Socket aSocket, StockMarket aSM)
     {
@@ -57,34 +54,25 @@ class ClientConnect extends Thread
                 else if(inputText.equals("REGI"))
                 {
                     System.out.println("ACK:REGI:"+clientSocket.getLocalSocketAddress());
-                    out.println("REGI:SUCCESS:1");
+                    
+                    String ID = "" + clientSocket.getRemoteSocketAddress();
+                    tokens = ID.split(":");
+                    ID = tokens[1];
+
+                    out.println("REGI:SUCCESS:"+ID);
+                    mySMRef.registerUser(ID);
                     isRegistered = true;
+                    try{Thread.sleep(1000);}catch(Exception e){}
                 }
                 else if(inputText.equals("DISP"))
                 {   // Display Stock Market
                     if(isRegistered)
                     {
-                    	/**
-                    	 * 
-                    	 *  ERROR FOUND -- State didn't exist - exception was thrown
-                    	 *  Try, catch inserted
-                    	 * 
-                    	 */
-                    	String [][] aStock = null;
-                    	try
-                    	{
-                        aStock = mySMRef.getStockMarketState();
-                    	}catch(Exception e){ }
-                        if(aStock!=null)
-                        {
-                        	//objectOut.writeObject(mySMRef.getStockMarketState());
-                        	for(int i = 0; i < aStock.length; i++)
-                        	{
-                        		for(int j = 0; j < aStock[i].length; j++)
-                        		{
-                        			out.println("STK:"+aStock[i][j]+":"+aStock[i][j]+":"+aStock[i][j]);
-                        		}
-                        	}
+                        String [][] aStock = mySMRef.getStockMarketState();
+                        //objectOut.writeObject(mySMRef.getStockMarketState());
+                        for(int i = 0; i < aStock.length; i++)
+                        {                            
+                            out.println("STK:"+aStock[i][0]+":"+aStock[i][1]+":"+aStock[i][3]);
                         }
                         out.println("END:EOF");
                     }
@@ -93,11 +81,15 @@ class ClientConnect extends Thread
                         out.println("ERR:Not Registered");
                     }
                 }
-                else if(inputText.equals("BUY"))
+                else if(inputText.startsWith("BUY"))
                 {
-                    if(isRegistered)
+                    tokens = inputText.split(":");
+                    
+                    System.out.println(tokens[3]);
+                    
+                    if(mySMRef.checkID(tokens[3]))
                     {
-                        out.println("ACK:BUY:Not implemented yet!");
+                        out.println("ACK:BOUGHT:"+ tokens[2] + " shares:In " + tokens[1] + ":@" + mySMRef.checkSharePrice(tokens[1]));
                     }
                     else
                     {

@@ -51,6 +51,8 @@ public class Client extends Socket{
 	 */
 	public void Write(String string){ out.Send(string); }
 	
+	public String Read(){ return in.getData(); }
+	
 	/**
 	 * Data sender class
 	 * @author Adam
@@ -123,7 +125,7 @@ public class Client extends Socket{
 	{
 		//Buffered reader is used for receiving data from the server
 		BufferedReader in;
-		//Holds the last piece of data received by the server
+		//Data
 		String data;
 		//Boolean holds if the client is alive
 		boolean IS_CLIENT_ALIVE = false;
@@ -135,6 +137,7 @@ public class Client extends Socket{
 		{
 			//Initialise the bufferedreader
 			try {
+				data = "";
 				in = new BufferedReader(new InputStreamReader(client.getInputStream()));
 				IS_CLIENT_ALIVE = client.isConnected();
 			} catch (IOException e) {
@@ -142,6 +145,8 @@ public class Client extends Socket{
 				System.out.println(e.getMessage());
 			}
 		}
+		
+		public String getData(){ return data; }
 		
 		
 		/**
@@ -163,12 +168,15 @@ public class Client extends Socket{
 				//Check for errors
 				try
 				{
+					data = "";
 					String _data;
 					while((_data = in.readLine()) != null)
 					{
 						System.out.println("Data received from server:" + _data);
 						
+						//data = _data;
 						data = _data;
+						
 					}
 					
 					

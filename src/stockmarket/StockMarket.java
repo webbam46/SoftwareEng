@@ -1,8 +1,7 @@
 package stockmarket;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.util.Random;
+import java.io.*;
+import java.util.*;
 
 public class StockMarket implements Runnable
 {
@@ -12,6 +11,8 @@ public class StockMarket implements Runnable
     private String filename = "stocks.csv";
     private String delims = ",";
     private String[] tokens;
+
+    private String[] registeredIDs = new String[20];
 
     private Random rnd;
 
@@ -36,6 +37,52 @@ public class StockMarket implements Runnable
         }
         return ref;
         
+    }
+
+    public boolean registerUser(String aID)
+    {
+        int count = 0;
+        while(registeredIDs[count] != null)
+        {
+            count++;
+        }
+        if(count < 20)
+        {
+            registeredIDs[count] = aID;
+        }
+        return true;
+    }
+
+    public String checkSharePrice(String aCompany)
+    {
+        String temp = "";
+        for(int i = 0; i < stockData.length; i++)
+        {
+            if(stockData[i][0].equals(aCompany))
+            {
+                temp = stockData[i][1];
+                break;
+            }
+        }
+        return temp;
+    }
+
+    public boolean checkID(String anID)
+    {
+        int count = 0;
+        while(registeredIDs[count] != null)
+        {
+        	//Change from == to equals
+            if(registeredIDs[count].equals(anID))
+            {
+                return true;
+            }
+            else
+            {
+                count++;
+            }
+        }
+        return false;
     }
 
     private void populateStockData()
@@ -120,3 +167,22 @@ public class StockMarket implements Runnable
         }
     }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

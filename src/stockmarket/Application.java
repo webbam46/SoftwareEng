@@ -18,19 +18,16 @@ public class Application {
 				
 				 	Server mySTS = new Server();
 			        mySTS.initSTS();
-			        mySTS.listenForClients();
-					
-					
-				
+			        mySTS.listenForClients();	
 			}
 		})).start();
 		
 		//Stock market interface
 		StockMarketInterface stockMarketInt = new StockMarketInterface();
-		//Display
-		stockMarketInt.Display();
-		
-
+		//Display help message
+		stockMarketInt.Help();
+		//Buy shares
+		stockMarketInt.Buy(10,"Microsoft");
 	}
 
 }
