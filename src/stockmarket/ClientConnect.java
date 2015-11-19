@@ -1,3 +1,5 @@
+package stockmarket;
+
 import java.io.*;
 import java.net.*;
 
@@ -59,7 +61,8 @@ class ClientConnect extends Thread
 
                     out.println("REGI:SUCCESS:"+ID);
                     mySMRef.registerUser(ID);
-                    isRegistered = false;
+                    isRegistered = true;
+                    try{Thread.sleep(1000);}catch(Exception e){}
                 }
                 else if(inputText.equals("DISP"))
                 {   // Display Stock Market
@@ -81,6 +84,8 @@ class ClientConnect extends Thread
                 else if(inputText.startsWith("BUY"))
                 {
                     tokens = inputText.split(":");
+                    
+                    System.out.println(tokens[3]);
                     
                     if(mySMRef.checkID(tokens[3]))
                     {

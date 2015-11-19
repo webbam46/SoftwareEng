@@ -1,3 +1,5 @@
+package stockmarket;
+
 import java.io.*;
 import java.util.*;
 
@@ -70,7 +72,8 @@ public class StockMarket implements Runnable
         int count = 0;
         while(registeredIDs[count] != null)
         {
-            if(registeredIDs[count] == anID)
+        	//Change from == to equals
+            if(registeredIDs[count].equals(anID))
             {
                 return true;
             }

@@ -1,8 +1,9 @@
 package stockmarket;
+
 import java.net.*;
 import java.io.*;
 
-public class Server 
+public class Server
 {
 
     protected ServerSocket STSSocket = null;
@@ -29,7 +30,7 @@ public class Server
             while(true)
             {
                 System.out.println("Listening for connections from Client.\n");
-                new ClientConnect(STSSocket.accept(), mySM);
+                new ClientConnect(STSSocket.accept(), mySM.getStockMarket());
             }
         }
         catch(IOException e)
@@ -39,5 +40,4 @@ public class Server
         }
     }
 
-    
 }
