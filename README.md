@@ -58,6 +58,15 @@ Adam - Role
 - Must be able to use guid to buy/sell/view shares
 - Possibly talk with client, get more info
 
+##SPRINT05
+###Roles
+Peter - Role
+Jordan - Role
+Charles - Role
+Emma - Role
+Robert - Role
+Adam - Role
+
 
 
 
