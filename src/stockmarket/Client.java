@@ -34,16 +34,23 @@ public class Client extends Socket{
 	 */
 	public Client(String ip,int port) throws IOException{ 
 		super(ip,port);
-		//Initialise output
-		out = new Sender(this);
-		//Start the sender thread
-		out.start();
 		//Initialise the receiver
 		in = new Receiver(this);
 		//Start the receiver thread
 		in.start();
+		//Initialise output
+		out = new Sender(this);
+		//Start the sender thread
+		out.start();
+		
 	
 	}
+	
+	/**
+	 * Stop the in/out threads
+	 */
+	@SuppressWarnings("deprecation")
+	public void Stop(){ in.stop(); out.stop(); }
 	
 	/**
 	 * Write some data to the server
@@ -51,6 +58,10 @@ public class Client extends Socket{
 	 */
 	public void Write(String string){ out.Send(string); }
 	
+	/**
+	 * Read data from the server
+	 * @return
+	 */
 	public String Read(){ return in.getData(); }
 	
 	/**
@@ -111,6 +122,13 @@ public class Client extends Socket{
 						data.remove(i);
 					}
 				} //Else do nothing, keep checking
+				
+				try {
+					Thread.sleep(1000);
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 			}
 		}
 	}
@@ -163,27 +181,41 @@ public class Client extends Socket{
 		public void run()
 		{
 			//Keep looping and checking for data
-			while(IS_CLIENT_ALIVE)
+			while(true)
 			{
 				//Check for errors
 				try
 				{
 					data = "";
 					String _data;
-					while((_data = in.readLine()) != null)
-					{
+					//while((_data = in.readLine()) != null)
+					//{
+					//	System.out.println("Data received from server:" + _data);
+					//	
+					//	//data = _data;
+					//	data = _data;
+					//	
+					//}
+					
+					while(!(_data = in.readLine()).equals(""))
+		            {
 						System.out.println("Data received from server:" + _data);
 						
 						//data = _data;
 						data = _data;
-						
-					}
+		            }
 					
 					
 				//Catch - and display the error
 				}catch(Exception e){ System.out.println(e.getMessage()); }
+				try {
+					Thread.sleep(1000);
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 			}
-			this.stop();
+			
 		}
 	}
 }

@@ -44,11 +44,13 @@ class ClientConnect extends Thread
                 {
                     System.out.println("ACK:" + clientSocket.getLocalSocketAddress() + ":" + clientSocket.getRemoteSocketAddress());
                     out.println("ACK:" + clientSocket.getLocalSocketAddress() + ":" + clientSocket.getRemoteSocketAddress());
+                    out.println("");
                 }
                 else if(inputText.equals("EXIT"))
                 {
                     System.out.println("ACK:EXIT:Goodbye!");
                     out.println("ACK:EXIT:Connection Closed.");
+                    out.println("");
                     break;
                 }
                 else if(inputText.equals("REGI"))
@@ -60,13 +62,15 @@ class ClientConnect extends Thread
                     ID = tokens[1];
 
                     out.println("REGI:SUCCESS:"+ID);
+                    out.println("");
                     mySMRef.registerUser(ID);
-                    isRegistered = true;
-                    try{Thread.sleep(1000);}catch(Exception e){}
+                    isRegistered = false;
                 }
                 else if(inputText.equals("DISP"))
                 {   // Display Stock Market
-                    if(isRegistered)
+                	//3 == out of bounds
+                	//changed to tokens[1]
+                    if(mySMRef.checkID(tokens[1]))
                     {
                         String [][] aStock = mySMRef.getStockMarketState();
                         //objectOut.writeObject(mySMRef.getStockMarketState());
@@ -75,17 +79,17 @@ class ClientConnect extends Thread
                             out.println("STK:"+aStock[i][0]+":"+aStock[i][1]+":"+aStock[i][3]);
                         }
                         out.println("END:EOF");
+                        out.println("");
                     }
                     else
                     {
                         out.println("ERR:Not Registered");
+                        out.println("");
                     }
                 }
                 else if(inputText.startsWith("BUY"))
                 {
                     tokens = inputText.split(":");
-                    
-                    System.out.println(tokens[3]);
                     
                     if(mySMRef.checkID(tokens[3]))
                     {
@@ -95,6 +99,7 @@ class ClientConnect extends Thread
                     {
                         out.println("ERR:Not Registered");
                     }
+                    out.println("");
                 }
                 else if(inputText.equals("SELL"))
                 {
@@ -106,6 +111,7 @@ class ClientConnect extends Thread
                     {
                         out.println("ERR:Not Registered");
                     }
+                    out.println("");
                 }
                 else if(inputText.equals("HELP"))
                 {
@@ -115,6 +121,7 @@ class ClientConnect extends Thread
                     out.println("SELL:");
                     out.println("EXIT:");
                     out.println("DISP:");
+                    out.println("");
                 }
                 else
                 {
@@ -132,5 +139,4 @@ class ClientConnect extends Thread
             System.out.println("Problem with socket: " + e);
         }
     }
-
 }
