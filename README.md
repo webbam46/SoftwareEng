@@ -73,8 +73,9 @@ Adam - Programmer - SCRUM Master
 Emily - Design
 
 ###Tasks
-- Ensure BUY/SELL/DISPLAY functionality work
-- Talk to client, receive feedback for final program
+- Ensure BUY/SELL/DISPLAY functionality works
+- Talk to client, receive feedback for final programer
+- Implement a visual user interface to interact with the program
 - Make changes if necessary
 
 
