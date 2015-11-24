@@ -74,7 +74,7 @@ Emily - Design
 ###Roles
 Peter - Design
 Jordan - Testing
-Charles - Programmer 
+Charles - Programmer
 Emma - Design
 Robert - Testing
 Adam - Programmer - SCRUM Master
@@ -82,7 +82,7 @@ Emily - Design
 
 ###Tasks
 - Ensure BUY/SELL/DISPLAY functionality works
-- Talk to client, receive feedback for final programer
+- Talk to client, receive feedback for final program
 - Implement a visual user interface to interact with the program
 - Make changes if necessary
 
