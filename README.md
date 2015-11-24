@@ -16,6 +16,8 @@ Emily - Design
 - Develop test cases
 - Implement Client class
 - Successfully connect to the server
+- 
+###STATUS - COMPLETE
 
 ##SPRINT02
 ###Roles
@@ -33,6 +35,8 @@ Emily - Design
 - Develop test cases
 - implement multi-threading
 
+###STATUS - COMPLETE
+
 ##SPRINT03
 ###Roles
 Peter - Design
@@ -46,6 +50,8 @@ Emily - Testing
 ###Tasks
 - Talk to client, more info needed for user stories 
 - Implement facade class
+
+###STATUS - COMPLETE
 
 ##SPRINT04
 ###Roles
@@ -62,6 +68,8 @@ Emily - Design
 - Must be able to use guid to buy/sell/view shares
 - Possibly talk with client, get more info
 
+###STATUS - COMPLETE
+
 ##SPRINT05
 ###Roles
 Peter - Design
@@ -77,5 +85,7 @@ Emily - Design
 - Talk to client, receive feedback for final programer
 - Implement a visual user interface to interact with the program
 - Make changes if necessary
+
+###STATUS - COMPLETE
 
 
