@@ -132,7 +132,7 @@ public class StockMarket implements Runnable
             {
                 lastTime = currentTime;
 
-                System.out.println("Stock Market updated each 5s.");
+                //System.out.println("Stock Market updated each 5s.");
                 updateStockPrice();
             }
         }
@@ -162,7 +162,7 @@ public class StockMarket implements Runnable
                 }
                       stockData[i][1] = ""+aVal;
 
-                System.out.println("UPD:"+stockData[i][0]+":"+stockData[i][1]+":"+stockData[i][3]);
+                //System.out.println("UPD:"+stockData[i][0]+":"+stockData[i][1]+":"+stockData[i][3]);
             }
         }
     }

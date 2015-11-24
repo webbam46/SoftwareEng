@@ -24,10 +24,8 @@ public class Application {
 		
 		//Stock market interface
 		StockMarketInterface stockMarketInt = new StockMarketInterface();
-		//Display help message
-		stockMarketInt.Help();
-		//Buy shares
-		stockMarketInt.Buy(10,"Microsoft");
+		//Start the interface
+		stockMarketInt.Start();
 	}
 
 }
