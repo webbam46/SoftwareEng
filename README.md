@@ -16,7 +16,7 @@ Emily - Design
 - Develop test cases
 - Implement Client class
 - Successfully connect to the server
-- 
+
 ###STATUS - COMPLETE
 
 ##SPRINT02
