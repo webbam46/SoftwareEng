@@ -72,6 +72,9 @@ Robert - Testing
 Adam - Programmer - SCRUM Master
 Emily - Design
 
-
+###Tasks
+- Ensure BUY/SELL/DISPLAY functionality work
+- Talk to client, receive feedback for final program
+- Make changes if necessary
 
 
