@@ -66,10 +66,18 @@ class ClientConnect extends Thread
                     mySMRef.registerUser(ID);
                     isRegistered = false;
                 }
-                else if(inputText.equals("DISP"))
+                /*
+                 * 
+                 *  Not taking ID
+                 *  Changed from equals, to starts with
+                 */
+                else if(inputText.startsWith("DISP"))
                 {   // Display Stock Market
                 	//3 == out of bounds
                 	//changed to tokens[1]
+                	
+                	tokens = inputText.split(":");
+                	
                     if(mySMRef.checkID(tokens[1]))
                     {
                         String [][] aStock = mySMRef.getStockMarketState();
@@ -121,6 +129,7 @@ class ClientConnect extends Thread
                     out.println("SELL:");
                     out.println("EXIT:");
                     out.println("DISP:");
+                    out.println("CURRENT:");
                     out.println("");
                 }
                 else

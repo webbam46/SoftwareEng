@@ -1,13 +1,49 @@
 package stockmarket;
 
+import java.util.ArrayList;
 import java.util.Scanner;
 
+import stockmarket.StockMarketInterface.Share;
+
 public class StockMarketInterface {
+	
+	/**
+	 * Share class
+	 * @author Computing
+	 *
+	 */
+	class Share
+	{
+		// Constructor
+		public Share(double number,String company)
+		{ System.out.println("New owned share: " + number + " " + company); this.number = number; this.company = company; }
+		
+		//Display share
+		public void Display()
+		{
+			System.out.println("SHARE");
+			System.out.println("Number: " + number);
+			System.out.println("Company: " + company);
+			System.out.println("--------------");
+		}
+		
+		//Number owned
+		double number;
+		//Company
+		String company;
+		
+		public double getNumber(){ return number; }
+		public String getCompany(){ return company; }
+		public void setNumber(double val){number=val;}
+		public void setCompany(String val){company=val;}
+	}
 	
 	//The client used to connect to the stock market server
 	Client c;
 	//The unique id used to send commands
 	String ID;
+	//Holds shares owned
+	ArrayList<Share> owned_shares = new ArrayList<Share>();
 	
 	/**
 	 * Main constructor
@@ -54,6 +90,8 @@ public class StockMarketInterface {
 			if(input.equals("DISP")){ this.Display(); }
 			//BUY SHARES
 			if(input.equals("BUY")){ this.Buy(); }
+			//CURRENTLY OWNED shares
+			if(input.equals("CURRENT")){ this.displayCurrent(); }
 			
 			
 		}
@@ -68,7 +106,7 @@ public class StockMarketInterface {
 	 */
 	public String getInput()
 	{
-		System.out.println("Waiting for input...");
+		//System.out.println("Waiting for input...");
 		Scanner user_input = new Scanner(System.in);
 		String input = user_input.next();
 		System.out.println("Received input...: " + input);
@@ -84,7 +122,7 @@ public class StockMarketInterface {
 	public void Display()
 	{
 		//DISP -- Display stock market
-		c.Write("DISP"); 
+		c.Write("DISP:" + ID); 
 	}
 	
 	/**
@@ -98,6 +136,8 @@ public class StockMarketInterface {
 		System.out.println("Enter company: ");
 		String company = this.getInput();
 		Buy(num,company);
+		
+		
 	}
 	/**
 	 * Buy shares
@@ -106,8 +146,38 @@ public class StockMarketInterface {
 	 */
 	public void Buy(double number,String company)
 	{
-		c.Write("BUY:" + company + ":" + Double.toString(number) + ":" + ID);
+		boolean exists = false;
 		
+			c.Write("BUY:" + company + ":" + Double.toString(number) + ":" + ID);
+			
+			for(Share s : owned_shares)
+			{
+				if(s.getCompany().equals(company))
+				{
+					exists =true;
+					s.setNumber(s.getNumber() + number);
+				}
+			}
+			
+			if(!exists){ owned_shares.add(new Share(number,company));}
+		
+	}
+	
+	public void displayCurrent()
+	{
+		if(!owned_shares.isEmpty())
+		{
+			System.out.println("Enter company: ");
+			String company = this.getInput();
+			
+			for(Share s : owned_shares)
+			{
+				if(s.getCompany().equals(company))
+				{
+					s.Display();
+				}
+			}
+		}else{ System.out.println("You don't own any shares"); }
 	}
 	
 	/**
@@ -136,5 +206,7 @@ public class StockMarketInterface {
 	 * Exit the server.. close the connection
 	 */
 	public void Exit(){ c.Write("EXIT"); Wait(1000); c.Stop(); }
-
+	
+	
+	
 }
