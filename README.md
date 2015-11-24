@@ -3,12 +3,13 @@ Each SPRINT will exists as a seperate branch in the repository
 
 ##SPRINT01
 ###Roles
-Peter - Role
-Jordan - Role
-Charles - Role
-Emma - Role
-Robert - Role
-Adam - Role
+Peter - SCRUM Master
+Jordan - Testing
+Charles - Programmer
+Emma - Design
+Robert - Design
+Adam - Programmer
+Emily - Design
 
 ###Tasks
 - UML/Domain modelling for client and server classes
@@ -18,12 +19,13 @@ Adam - Role
 
 ##SPRINT02
 ###Roles
-Peter - Role
-Jordan - Role
-Charles - Role
-Emma - Role
-Robert - Role
-Adam - Role
+Peter - Design
+Jordan - Design
+Charles - Programmer
+Emma - SCRUM Master
+Robert - Testing
+Adam - Programmer
+Emily - Design
 
 ###Tasks
 - Talk to client, more info needed for user stories
@@ -33,12 +35,13 @@ Adam - Role
 
 ##SPRINT03
 ###Roles
-Peter - Role
-Jordan - Role
-Charles - Role
-Emma - Role
-Robert - Role
-Adam - Role
+Peter - Design
+Jordan - Testing
+Charles - Programmer
+Emma - Programmer
+Robert - SCRUM Master
+Adam - Design
+Emily - Testing
 
 ###Tasks
 - Talk to client, more info needed for user stories 
@@ -46,12 +49,13 @@ Adam - Role
 
 ##SPRINT04
 ###Roles
-Peter - Role
-Jordan - Role
-Charles - Role
-Emma - Role
-Robert - Role
-Adam - Role
+Peter - Testing
+Jordan - Programmer
+Charles - SCRUM Master
+Emma - Design
+Robert - Programmer
+Adam - Testing
+Emily - Design
 
 ###Tasks
 - Unique guid received when registering with the server
@@ -60,12 +64,13 @@ Adam - Role
 
 ##SPRINT05
 ###Roles
-Peter - Role
-Jordan - Role
-Charles - Role
-Emma - Role
-Robert - Role
-Adam - Role
+Peter - Design
+Jordan - Testing
+Charles - Programmer 
+Emma - Design
+Robert - Testing
+Adam - Programmer - SCRUM Master
+Emily - Design
 
 
 
