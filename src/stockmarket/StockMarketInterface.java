@@ -90,6 +90,8 @@ public class StockMarketInterface {
 			if(input.equals("DISP")){ this.Display(); }
 			//BUY SHARES
 			if(input.equals("BUY")){ this.Buy(); }
+			//SELL SHARES
+			if(input.equals("SELL")){ this.Sell(); }
 			//CURRENTLY OWNED shares
 			if(input.equals("CURRENT")){ this.displayCurrent(); }
 			
@@ -162,6 +164,40 @@ public class StockMarketInterface {
 			if(!exists){ owned_shares.add(new Share(number,company));}
 		
 	}
+	/**
+	 * Sell shares
+	 */
+	public void Sell()
+	{
+		System.out.println("Enter number: ");
+		double num = Double.parseDouble(this.getInput());
+		System.out.println("Enter company: ");
+		String company = this.getInput();
+		Sell(num,company);
+	}
+	/**
+	 * Sell shares
+	 * @param number
+	 * @param company
+	 */
+	public void Sell(double number,String company)
+	{
+			
+		
+			c.Write("SELL:" + company + ":" + Double.toString(number) + ":" + ID);
+			
+			for(Share s : owned_shares)
+			{
+				if(s.getCompany().equals(company))
+				{
+					s.setNumber(s.getNumber() - number);
+				}
+			}
+	
+		
+	}
+	
+	
 	
 	public void displayCurrent()
 	{

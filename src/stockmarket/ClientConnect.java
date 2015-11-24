@@ -109,11 +109,12 @@ class ClientConnect extends Thread
                     }
                     out.println("");
                 }
-                else if(inputText.equals("SELL"))
+                else if(inputText.startsWith("SELL"))
                 {
-                    if(isRegistered)
+                	tokens = inputText.split(":");
+                    if(mySMRef.checkID(tokens[3]))
                     {
-                        out.println("ACK:SELL:Not implemented yet!");
+                    	out.println("ACK:SOLD:"+ tokens[2] + " shares:In " + tokens[1] + ":@" + mySMRef.checkSharePrice(tokens[1]));
                     }
                     else
                     {
