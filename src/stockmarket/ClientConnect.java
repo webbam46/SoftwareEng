@@ -33,7 +33,6 @@ class ClientConnect extends Thread
             out = new PrintWriter(clientSocket.getOutputStream(), true);
             objectOut = new ObjectOutputStream(clientSocket.getOutputStream());
 
-                
             String inputText;
                 
             while((inputText = in.readLine()) != null)
