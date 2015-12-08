@@ -123,6 +123,9 @@ public class StockMarketInterface {
 		{
 			//Display help menu
 			Help(); 
+			//Suggest to enter command
+			Wait(1000);
+			System.out.println("Enter command: ");
 			//Wait for user input
 			String input = getInput();
 			
@@ -243,14 +246,11 @@ public class StockMarketInterface {
 	 */
 	public void Buy()
 	{
-		
 		System.out.println("Enter number: ");
 		double num = Double.parseDouble(this.getInput());
 		System.out.println("Enter company: ");
 		String company = this.getInput();
-		Buy(num,company);
-		
-		
+		Buy(num,company);	
 	}
 	/**
 	 * Buy shares
