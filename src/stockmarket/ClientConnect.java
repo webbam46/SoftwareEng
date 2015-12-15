@@ -1,7 +1,11 @@
 package stockmarket;
 
+
 import java.io.*;
 import java.net.*;
+import java.util.*;
+import java.text.*;
+
 
 class ClientConnect extends Thread
 {
@@ -15,12 +19,22 @@ class ClientConnect extends Thread
     protected boolean isRegistered = false;
     protected String[] tokens;
 
+    Calendar cal;
+    SimpleDateFormat sdf;
+
     public ClientConnect(Socket aSocket, StockMarket aSM)
     {
         clientSocket = aSocket;
         mySMRef = aSM;
         start();
+
+        cal = Calendar.getInstance();
+        sdf = new SimpleDateFormat("HH:mm:ss");
+
+
     }
+    
+    
 
     public void run()
     {
@@ -33,6 +47,7 @@ class ClientConnect extends Thread
             out = new PrintWriter(clientSocket.getOutputStream(), true);
             objectOut = new ObjectOutputStream(clientSocket.getOutputStream());
 
+                
             String inputText;
                 
             while((inputText = in.readLine()) != null)
@@ -62,22 +77,17 @@ class ClientConnect extends Thread
 
                     out.println("REGI:SUCCESS:"+ID);
                     out.println("");
-                    mySMRef.registerUser(ID);
-                    isRegistered = false;
+                    isRegistered = mySMRef.registerUser(Integer.parseInt(ID));                    
                 }
-                /*
-                 * 
-                 *  Not taking ID
-                 *  Changed from equals, to starts with
-                 */
                 else if(inputText.startsWith("DISP"))
                 {   // Display Stock Market
-                	//3 == out of bounds
-                	//changed to tokens[1]
-                	
-                	tokens = inputText.split(":");
-                	
-                    if(mySMRef.checkID(tokens[1]))
+                    tokens = inputText.split(":");
+                    out.println("DEBUG: You entered: DISP");
+                    System.out.println("DEBUG: DISP");
+                    System.out.println("DEBUG: Tokens is: " + tokens.length + " in size -- Value of [1] is: " + tokens[1]);
+
+
+                    if(mySMRef.checkID(Integer.parseInt(tokens[1])) == true)
                     {
                         String [][] aStock = mySMRef.getStockMarketState();
                         //objectOut.writeObject(mySMRef.getStockMarketState());
@@ -85,12 +95,16 @@ class ClientConnect extends Thread
                         {                            
                             out.println("STK:"+aStock[i][0]+":"+aStock[i][1]+":"+aStock[i][3]);
                         }
+                     
+                        System.out.println("TIME:" + sdf.format(cal.getTime()) );
+                        out.println("TIME:" + sdf.format(cal.getTime()) );
                         out.println("END:EOF");
                         out.println("");
                     }
                     else
                     {
                         out.println("ERR:Not Registered");
+                        System.out.println("User not registered.");
                         out.println("");
                     }
                 }
@@ -98,9 +112,10 @@ class ClientConnect extends Thread
                 {
                     tokens = inputText.split(":");
                     
-                    if(mySMRef.checkID(tokens[3]))
+                    if(mySMRef.checkID(Integer.parseInt(tokens[3])) == true)
                     {
-                        out.println("ACK:BOUGHT:"+ tokens[2] + " shares:In " + tokens[1] + ":@" + mySMRef.checkSharePrice(tokens[1]));
+                        String tempStr = mySMRef.buyShares(tokens);
+                        out.println(tempStr);
                     }
                     else
                     {
@@ -110,10 +125,13 @@ class ClientConnect extends Thread
                 }
                 else if(inputText.startsWith("SELL"))
                 {
-                	tokens = inputText.split(":");
-                    if(mySMRef.checkID(tokens[3]))
+                    tokens = inputText.split(":");
+
+                    if(mySMRef.checkID(Integer.parseInt(tokens[3])) == true)
                     {
-                    	out.println("ACK:SOLD:"+ tokens[2] + " shares:In " + tokens[1] + ":@" + mySMRef.checkSharePrice(tokens[1]));
+                        String tempStr = mySMRef.sellShares(tokens);
+                        out.println(tempStr);
+
                     }
                     else
                     {
@@ -121,16 +139,58 @@ class ClientConnect extends Thread
                     }
                     out.println("");
                 }
+                else if(inputText.startsWith("CASH"))
+                {
+                    tokens = inputText.split(":");
+                    
+                    if(mySMRef.checkID(Integer.parseInt(tokens[1])) == true)
+                    {
+                        String tempStr = mySMRef.checkCash(tokens[1]);
+                        out.println(tempStr);
+                    }
+                    else
+                    {
+                        out.println("ERR:Not Registered");
+                    }
+                    out.println("");
+
+                }
                 else if(inputText.equals("HELP"))
                 {
                     out.println("Commands:");
-                    out.println("REGI:");
-                    out.println("BUY:");
-                    out.println("SELL:");
-                    out.println("EXIT:");
-                    out.println("DISP:");
-                    out.println("CURRENT:");
+                    out.println("REGI: - Allows authentication with the system.");
+                    out.println("BUY: - Allows the purchasing of shares.");
+                    out.println("SELL: - Allows the selling of shares.");
+                    out.println("EXIT: - Exit the system (lose all shares and funds).");
+                    out.println("DISP: - Display current Stock market values.");
+                    out.println("CASH: - Display your remaining cash balance (not including shares owned).");
+                    out.println("AUTO_ON: - Enable automatic buy/sell shares");
+                    out.println("AUTO_OFF - Disable automatic buy/sell shares");
                     out.println("");
+                }
+                else if(inputText.equals("COMPANYNAMES")){
+                	ArrayList<String> companies = mySMRef.getCompanyNames();
+                	String _out = "";
+                	
+                	if(companies!=null){
+                		
+                		
+                		for(int i = 0 ; i < companies.size();i++){
+                			_out += companies.get(i) + ":";
+                		}
+                	}
+                	
+                	out.println(_out);
+                }
+                else if(inputText.startsWith("PRICEPERSHARE")){
+                	String[] _token = inputText.split(":");
+                	
+                	double price = mySMRef.pricePerShare(_token[1]);
+                	
+                	if(price!=-1){
+                		out.println(Double.toString(price));
+               
+                	}
                 }
                 else
                 {
@@ -148,4 +208,5 @@ class ClientConnect extends Thread
             System.out.println("Problem with socket: " + e);
         }
     }
+
 }
