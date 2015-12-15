@@ -3,224 +3,430 @@ package stockmarket;
 import java.util.ArrayList;
 import java.util.Scanner;
 
-import stockmarket.StockMarketInterface.Share;
-
 public class StockMarketInterface {
 	
-	/**
-	 * Share class
-	 * @author Computing
-	 *
+	//The client used to connect to the stock market server
+	Client client;
+	
+	/*
+	 * Contains stock market server information
 	 */
+	class ServerInformation{
+		//Static variables hold stock market connection data
+		public static final  String IP = "127.0.0.1"; //IP
+		public static final int PORT = 5000; //PORT
+		//Static variables for requesting functions from the server
+		public static final String REGISTER = "REGI"; //REGISTER
+		public static final String BUY = "BUY"; //BUY
+		public static final String SELL = "SELL"; //SELL
+		public static final String EXIT = "EXIT"; //EXIT
+		public static final String DISPLAY = "DISP"; //DISPLAY
+		public static final String CASH = "CASH"; //CASH
+		public static final String HELP = "HELP"; //HELP
+	}
+	//Holds the unique id used to send commands
+	private String ID = "";
+	
+	//Holds whether exit was requested
+	private boolean exit_requested = false;
+	
+	//Share structure
 	class Share
 	{
-		// Constructor
-		public Share(double number,String company,Double value)
-		{ System.out.println("New owned share: " + number + " " + company); this.number = number; this.company = company;
-		this.value = value;
-		}
-		
-		//Display share
-		public void Display()
-		{
-			System.out.println("SHARE");
-			System.out.println("Number: " + number);
-			System.out.println("Company: " + company);
-			System.out.println("Value-per-share: " + value);
-			System.out.println("Total value: " + getTotalValue());
-			System.out.println("--------------");
-		}
-		
-		/**
-		 * Check share against existing share value
-		 * if value is higher - we can sell the share
-		 */
-		public boolean CheckHigher(double new_value)
-		{
-			double new_total = number * new_value;
-			System.out.println("Checking share value");
-			System.out.println("OLD: " + getTotalValue());
-			System.out.println("NEW: " + new_total);
-			
-			if((getTotalValue())  < new_total){ return true; }
-			else{ return false; }
-		}
-		
-		/**
-		 * Check share against existing share value
-		 * if value is lower - we can sell the share
-		 */
-		public boolean CheckLower(double new_value)
-		{
-			double new_total = number * new_value;
-			System.out.println("Checking share value");
-			System.out.println("OLD: " + getTotalValue());
-			System.out.println("NEW: " + new_total);
-			
-			if(getTotalValue() > new_total){ return true; }
-			else{ return false; }
-		}
-		
-		//Number owned
-		double number;
 		//Company
-		String company;
-		//value
-		double value;
+		private String company; 
+		//Shares owned in company
+		private double amount;
+		//The price per share when last brought/sold
+		private double pricepershare;
 		
-		public double getNumber(){ return number; }
-		public String getCompany(){ return company; }
-		public double getValue(){ return value; }
-		public void setNumber(double val){number=val;}
-		public void setCompany(String val){company=val;}
-		public void setValue(double val){value=val;}
+		/**
+		 * Primary constructor
+		 * @param company
+		 * @param amount
+		 * @param pricepershare
+		 */
+		public Share(String company,double amount,double pricepershare){
+			this.company = company; this.amount = amount; this.pricepershare = pricepershare;
+		}
 		
-		public double getTotalValue(){ return number * value; }
+		//GET/SET company name
+		public String getCompany(){return company;} public void setCompany(String value){ company = value; }
+		//GET/SET shares owned
+		public double getAmount(){return amount;} public void setAmount(double value){ amount = value; }
+		//GET/SET price-per-share
+		public double getPricePerShare(){ return pricepershare; } public void setPricePerShare(double value){ pricepershare = value; }
+	}
+	//Contains owned shares
+	private ArrayList<Share> owned_shares = new ArrayList<Share>();
+	
+	
+	
+	/*
+	 *  Virtual user - A 'BOT' to automatically BUY/SELL shares
+	 */
+	class VirtualUser extends Thread{
+		
+		//If true - the bot is allowed to start buying/selling shares
+		private boolean isAllowed = false;
+		//Running flag
+		private boolean isRunning = true;
+		//Holds company names
+		private String[] names = null;
+		
+		/**
+		 * Only a default constructor is required
+		 */
+		public VirtualUser(boolean allow){
+			isAllowed = allow;
+			names = this.getCompanyNames();
+			this.start();
+		}
+		
+		/**
+		 * Main run method
+		 */
+		public void run(){
+			System.out.println("Started virtual user.");
+			//Keep looping
+			while(isRunning){
+				
+				//If allowed - start buying/selling shares
+				if(isAllowed == true && requesting_menu == false){
+					System.out.println("Virtual user is trying to buy/sell shares");
+					
+					//double pershare = this.getPricePerShare(names[1]);
+					//System.out.println(pershare);
+					
+					//Cycle through each company
+					for(int i = 0; i < names.length;i++){
+						String name = names[i];
+						//Do we own a share for this company?
+						if(hasShares(name)){
+							//System.out.println("Has shares for company: " + name);
+							
+							//We need to see if the price-per-share has increased, then we can sell the share
+							double pershare = this.getPricePerShare(name);
+							Share _s = getShare(name);
+							if(pershare > _s.getPricePerShare()){
+								Sell(name,1);
+								System.out.println("SOLD Share");
+							}
+							
+						}
+						//We don't own a share for this company.. we can buy one
+						else
+						{
+							Buy(name,1);
+							
+							//System.out.println("Does not have shares for company : " + name);
+							
+							
+						}
+						
+						
+					}
+					
+					
+					
+					Wait(10000);
+				}
+				
+				
+			}
+		}
+		
+		
+		/**
+		 * We may need to get company names
+		 * @return
+		 */
+		public String[] getCompanyNames(){
+			client.Write("COMPANYNAMES");
+			Wait(1000);
+			String _companies = client.Read();
+			
+			System.out.println("Got companies: " + _companies);
+			if(_companies!=null){
+				return _companies.split(":");
+			}else{  return null;}
+			
+		}
+		
+		/**
+		 * We may need the price-per-share value for a company
+		 * @param company
+		 * @return
+		 */
+		public double getPricePerShare(String company){
+			try
+			{
+				client.Write("PRICEPERSHARE:" + company);
+				Wait(1000);
+				String _data = client.Read();
+				System.out.println("Got price-per-share: " + _data);
+				if(_data!=null&&_data!=" "){
+				
+			
+					return Double.parseDouble(_data);
+				}else{ return -1; }
+			}catch(Exception e){ System.out.println("Error getting value"); return -1; }
+		}
+		
+		/**
+		 * Used to allow the bot to operate
+		 */
+		public void Allow(boolean flag){ isAllowed = flag; }
 		
 	}
+	//We need an object for a virtual user
+	private VirtualUser vu;
 	
-	//The client used to connect to the stock market server
-	Client c;
-	//The unique id used to send commands
-	String ID;
-	//Holds shares owned
-	ArrayList<Share> owned_shares = new ArrayList<Share>();
-	//If true - the system will automatically buy/sell shares
-	public static boolean AUTO_FUNC = false;
-	//Holds current money owned
-	public double money = 100000;
+	//String holds the help menu
+	private boolean requesting_menu = false;
 	
 	/**
 	 * Main constructor
 	 */
-	public StockMarketInterface()
-	{
-		//Handles any errors
+	public StockMarketInterface(){
+		//Check for errors
 		try
 		{
-			//Init the client
-			c = new Client("127.0.0.1",5000);
-			//Just keep as 0 for now
-			ID ="";
-			//We can register when the interface is initialised
-			Register();
+			//Initialise the client
+			client = new Client(ServerInformation.IP,ServerInformation.PORT);
+			//ID may be initially empty
+			ID = "";
+			//We can register with the system
+			this.Register();
 			//Wait..
 			Wait(1000);
-			
-		}catch(Exception e){ System.out.println(e.getMessage()); }
+			//Initialise the virtual user
+			vu = new VirtualUser(false);
+		}
+		//Catch any errors..
+		catch(Exception e){ System.out.println(e.getMessage()); }
+		
 	}
 	
 	/**
-	 * Start the user interface
+	 * Register with the stock market system
 	 */
-	public void Start()
-	{
+	public void Register(){
+		//Write appropriate string to the client
+		client.Write(ServerInformation.REGISTER);
+		//Wait for response
+		Wait(1000);
+		//Gather the user ID
+		ID = client.Read().split(":")[2];
+		//Print the user ID - ensure that it is valid
+		System.out.println("Received ID: " + ID);
+		
+	}
+	
+	/**
+	 * Used to start the stock market interface
+	 */
+	public void Start(){
+		/*
+		 * Main header
+		 */
 		System.out.println("****************************************");
 		System.out.println("-------------STOCK MARKET-----------------");
 		System.out.println("****************************************");
-		Check();
-		while(true)
-		{
-			//Display help menu
-			Help(); 
-			//Suggest to enter command
-			Wait(1000);
-			System.out.println("Enter command: ");
-			//Wait for user input
-			String input = getInput();
+		/*
+		 * While loop holds while the user is using the system
+		 */
+		while(this.exit_requested == false){
+			//Display the help menu
+			this.Help();
+			//Request user input
+			String userInput = this.getInput("Enter option:");		
 			
-			/**
-			 * Check user input
+			/*
+			 *  Check the user input.. which option was chosen?
+			 * 
 			 */
-			//EXIT SERVER
-			if(input.equals("EXIT")){ this.Exit(); break; }
-			//DISPLAY
-			if(input.equals("DISP")){ this.Display(); }
-			//BUY SHARES
-			if(input.equals("BUY")){ 
-				if(AUTO_FUNC==false)
-				{
-				this.Buy();
-				}else
-					{
-						System.out.println("Turn off AUTO before using this option");
-					}
-			}
-			//SELL SHARES
-			if(input.equals("SELL")){ 
-				if(AUTO_FUNC==false)
-				{
-				this.Sell();
-				}else{ System.out.println("Turn off AUTO before using this option"); }
-			}
-			//CURRENTLY OWNED shares
-			if(input.equals("CURRENT")){ this.displayCurrent(); }
-			//TURN AUTO ON
-			if(input.equals("AUTO_ON")){ 
-				System.out.println("AUTO TURNED ON");
-				AUTO_FUNC = true;
-			}
-			//TURN AUTO OFf
-			if(input.equals("AUTO_OFF")){
-				System.out.println("AUTO TURNED OFF");
-				AUTO_FUNC  =false;
-			}
-			
+			switch(userInput){
+				//Register chosen
+				case ServerInformation.REGISTER: Register(); break;
+				//Buy function chosen
+				case ServerInformation.BUY: Buy(); break;
+				//Sell function chosen
+				case ServerInformation.SELL: Sell(); break;
+				//Exit chosen
+				case ServerInformation.EXIT: Exit(); break;
+				//Display chosen
+				case ServerInformation.DISPLAY: Display();  break;
+				//Cash chosen
+				case ServerInformation.CASH: Cash(); break;
+				//Auto on chosen
+				case "AUTO_ON": vu.Allow(true); Wait(1000); break;
+				//Auto off chosen
+				case "AUTO_OFF": vu.Allow(false); Wait(10000); break;
+ 			}
 		}
-		System.out.println("****************************************");
 	}
 	
 	/**
-	 * We can use a different thread to automatically buy/sell shares - if required
+	 * Displays the help menu
 	 */
-	public void Check()
-	{
-		Thread _auto = new Thread(new Runnable() {
-			
-			@Override
-			public void run() {
-				// TODO Auto-generated method stub
-				while(true)
-				{
-					if(StockMarketInterface.AUTO_FUNC)
-					{
-						try{Thread.sleep(5000);
-							System.out.println("Trying to buy/sell shares");
-							
-							if(Buy(1,"Microsoft"))
-							{ System.out.println("AUTOMATICALLY BROUGHT SHARE");
-							System.out.println("MONEY: " + money);
-							}
-							
-							
-							Thread.sleep(20000);
-							
-							
-
-							if(Sell(1,"Microsoft"));
-							{ System.out.println("AUTOMATICALLY SOLD SHARE"); 
-								System.out.println("MONEY: " + money);
-							}
-					
-						}catch(Exception e){ System.out.println(e.getMessage()); 
-						System.out.println(e.getMessage()); }
-						
-					}
-				}
-				
-			}
-		});
-		
-		_auto.start();
+	public void Help(){
+		//Write appropriate string to the client
+		client.Write(ServerInformation.HELP);
+		requesting_menu = true;
+	
+		//Wait for response
+		Wait(1000);
+		requesting_menu = false;
 		
 	}
+	
+	/**
+	 * Is called to exit the system
+	 */
+	public void Exit(){
+		//Write appropriate string to the client
+		client.Write(ServerInformation.EXIT);
+		//Wait for response
+		Wait(1000);
+		//Set the exit request flag
+		this.exit_requested = true;
+		
+	}
+	
+	/**
+	 * Checks if own shares for specified company
+	 * @param company
+	 * @return
+	 */
+	public boolean hasShares(String company){
+		for(int i = 0; i < owned_shares.size();i++){
+			if(owned_shares.get(i).getCompany() == company){
+				return true;
+			}
+		} return false;
+	}
+	
+	/**
+	 * Return an owned share for the specified company
+	 * @param company
+	 * @return
+	 */
+	public Share getShare(String company)
+	{  
+		for(int i = 0 ;i < owned_shares.size();i++){
+			if(owned_shares.get(i).getCompany() == company){
+				return owned_shares.get(i);
+			}
+		} return null;
+		
+	}
+	
+	/**
+	 * Function is called to buy shares
+	 */
+	public void Buy(){
+		try
+		{
+			/*
+		 	* Get user input for company, and amount
+		 	*/
+			String company = this.getInput("Enter Company:");
+			double amount = Double.parseDouble(this.getInput("Enter Amount:"));
+			System.out.println("BUY details entered");
+			System.out.println("COMPANY: " + company);
+			System.out.println("AMOUNT: " + amount);
+			Buy(company,amount);
+		}catch(Exception e){ System.out.println("Error parsing input, unable to buy share"); }
+	}
+	public void Buy(String company,double amount){
+		//Add to owned shares array
+		double price_per_share = vu.getPricePerShare(company);
+		
+		
+		boolean found = false;
+		for(int i = 0 ; i < owned_shares.size();i++){
+			if(owned_shares.get(i).getCompany() == company){
+				double last_amount = owned_shares.get(i).getAmount();
+				double new_amount = last_amount + amount;
+				owned_shares.get(i).setAmount(new_amount);
+				owned_shares.get(i).setPricePerShare(price_per_share);
+			}
+		}
+		
+		if(!found){
+			owned_shares.add(new Share(company,amount,price_per_share));
+		}
+		
+		//Write appropriate string to the client
+		client.Write(this.createToken(ServerInformation.BUY + ":" + company + ":" + Double.toString(amount)));
+		//Wait for response
+		Wait(1000);
+			
+	}
+	
+	/**
+	 * Function is called to sell shares
+	 */
+	public void Sell(){
+		try
+		{
+			/*
+		 	* Get user input for company, and amount
+		 	*/
+			String company = this.getInput("Enter Company:");
+			double amount = Double.parseDouble(this.getInput("Enter Amount:"));
+			System.out.println("SELL details entered");
+			System.out.println("COMPANY: " + company);
+			System.out.println("AMOUNT: " + amount);
+			Sell(company,amount);
+		}catch(Exception e){ System.out.println("Error parsing input, unable to sell share"); }
+	}
+	public void Sell(String company,double amount){
+		//Write appropriate string to the client
+		client.Write(this.createToken(ServerInformation.SELL + ":" + company + ":" + Double.toString(amount)));
+		//Wait for response
+		Wait(1000);
+			
+	}
+	
+	/**
+	 * Function is used to display shares
+	 */
+	public void Display(){
+		//Write appropriate string to the client
+		//client.Write(this.createToken(ServerInformation.DISPLAY));
+		client.Write("PRICEPERSHARE:AVIVA");
+		Wait(1000);
+		String _data = client.Read();
+		System.out.println("Got data: " + _data);
+		
+		//Wait for response
+		//Wait(1000);
+	}
+	
+	/**
+	 * Function is used to display cash balance
+	 */
+	public void Cash(){
+		//Write appropriate string to the client
+		client.Write(this.createToken(ServerInformation.CASH));
+		//Wait for response
+		Wait(1000);
+	}
+	
 	
 	/**
 	 * Get user input
 	 * @return
 	 */
-	public String getInput()
+	public String getInput(String message)
 	{
+		if(message!=null){
+			System.out.println(message);
+		}
+		
+		
 		//System.out.println("Waiting for input...");
 		Scanner user_input = new Scanner(System.in);
 		String input = user_input.next();
@@ -228,184 +434,16 @@ public class StockMarketInterface {
 		return input;
 	}
 	
-	public void Wait(long ms)
-	{ try{ Thread.sleep(ms); }catch(Exception e){ System.out.println(e.getMessage()); } } 
-	
-	/**
-	 * Display the stock market
-	 */
-	public void Display()
-	{
-		//DISP -- Display stock market
-		c.Write("DISP:" + ID); 
+	private String createToken(String message){
+		return message + ":" + ID;
 	}
 	
+	
 	/**
-	 * Buy shares
-	 * 
+	 * Used to wait
 	 */
-	public void Buy()
-	{
-		System.out.println("Enter number: ");
-		double num = Double.parseDouble(this.getInput());
-		System.out.println("Enter company: ");
-		String company = this.getInput();
-		Buy(num,company);	
+	public void Wait(long ms){
+		try{ Thread.sleep(ms); }catch(Exception e){ System.out.println(e.getMessage()); }
 	}
-	/**
-	 * Buy shares
-	 * @param number
-	 * @param company
-	 */
-	public boolean Buy(double number,String company)
-	{
-		boolean exists = false;
-		
-		c.Write("BUY:" + company + ":" + Double.toString(number) + ":" + ID);
-		Wait(1000);
-		String buy_msg = c.Read();
-		String share_value = buy_msg.split(":")[4].split("@")[1];
-		double _share_value = Double.parseDouble(share_value);
-		System.out.println("BUYMSG" + share_value);
-		
-		//Can we buy the shares with our money?
-		if( ((money - (number * _share_value)) > 0 ))
-		{
-			//Cycle shares
-			
-			for(Share s : owned_shares)
-			{
-				if(s.getCompany().equals(company))
-				{
-					//Only sell if value is higher
-					if(s.CheckLower(_share_value))
-					{
-						exists =true;
-						s.setNumber(s.getNumber() + number);
-						//Decrease money
-						money -= (number * _share_value);
-						s.setValue(_share_value);
-						return true;
-					}
-				}
-			}
-			
-			if(!exists){ owned_shares.add(new Share(number,company,_share_value));
-			money -= (number * _share_value); return true; }
-		}else{ System.out.println("Cannot buy share.. not enough money"); }
-		return false;
-		
-	}
-	/**
-	 * Sell shares
-	 */
-	public void Sell()
-	{	
-		System.out.println("Enter number: ");
-		double num = Double.parseDouble(this.getInput());
-		System.out.println("Enter company: ");
-		String company = this.getInput();
-		Sell(num,company);
-	}
-	/**
-	 * Sell shares
-	 * @param number
-	 * @param company
-	 */
-	public boolean Sell(double number,String company)
-	{
-		//If given number is above 0
-		if(number>0)
-		{
-				c.Write("SELL:" + company + ":" + Double.toString(number) + ":" + ID);
-				Wait(1000);
-				String buy_msg = c.Read();
-				String share_value = buy_msg.split(":")[4].split("@")[1];
-				double _share_value = Double.parseDouble(share_value);
-				
-				//If own shares
-				if(owned_shares.size()>0)
-				{
-					//Cycle shares
-					for(Share s : owned_shares)
-					{
-						//Does the company exist?
-						if(s.getCompany().equals(company))
-						{
-							//If stocks owned
-							if(s.getNumber()> 0 && number <= s.getNumber())
-							{
-								//Only sell if value is higher
-								if(s.CheckHigher(_share_value))
-								{
-									//Print debug message
-									System.out.println("Accepted, selling " + number + " shares for company " + company + " with value " + _share_value);
-									//Update share value number
-									s.setNumber(s.getNumber() - number);
-									//Update money
-									money += (number * _share_value);
-									s.Display();
-									return true;
-								}else{  }
-							
-							}else{  }
-					
-						}else{   }
-					}
-			}else{  }
-			
-		}
-		return false;
-	}
-	
-	/**
-	 * Display currently owned shares
-	 */
-	public void displayCurrent()
-	{
-		if(!owned_shares.isEmpty())
-		{
-			System.out.println("Enter company: ");
-			String company = this.getInput();
-			
-			for(Share s : owned_shares)
-			{
-				if(s.getCompany().equals(company))
-				{
-					s.Display();
-				}
-			}
-		}else{ System.out.println("You don't own any shares"); }
-	}
-	
-	/**
-	 * Display help messages
-	 */
-	public void Help()
-	{ c.Write("HELP"); Wait(1000); System.out.println("AUTO_ON:");
-	System.out.println("AUTO_OFF:");
-	System.out.println(" -- CURRENT MONEY: " + money);}
-	
-	/**
-	 * Register with the stock market
-	 */
-	public void Register()
-	{
-		//REGI = string needed to register
-		c.Write("REGI");
-		//Sleep
-		try {Thread.sleep(1000);}catch(Exception e){System.out.println(e.getMessage()); }
-		//Get ID
-		ID = c.Read().split(":")[2];
-		//Print ID
-		System.out.println("RECEIVED ID: " + ID); 
-	}
-	
-	/**
-	 * Exit the server.. close the connection
-	 */
-	public void Exit(){ c.Write("EXIT"); Wait(1000); c.Stop(); }
-	
-	
-	
+
 }
