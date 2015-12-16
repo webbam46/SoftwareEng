@@ -18,17 +18,17 @@ public class Application {
 		/*
 		 * The server will be started here
 		 */
-		//(new Thread(new Runnable() {
-		//	
-		//	@Override
-		//	public void run() {
-		//		// TODO Auto-generated method stub
-		//		
-		//		 	Server mySTS = new Server();
-		//	        mySTS.initSTS();
-		//	        mySTS.listenForClients();	
-		//	}
-		//})).start();
+		(new Thread(new Runnable() {
+			
+			@Override
+			public void run() {
+				// TODO Auto-generated method stub
+				
+				 	Server mySTS = new Server();
+			        mySTS.initSTS();
+			        mySTS.listenForClients();	
+			}
+		})).start();
 		
 		//Stock market interface
 		StockMarketInterface stockMarketInt = new StockMarketInterface();

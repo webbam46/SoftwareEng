@@ -164,6 +164,7 @@ class ClientConnect extends Thread
                     out.println("EXIT: - Exit the system (lose all shares and funds).");
                     out.println("DISP: - Display current Stock market values.");
                     out.println("CASH: - Display your remaining cash balance (not including shares owned).");
+                    out.println("OWNED - Display owned shares");
                     out.println("AUTO_ON: - Enable automatic buy/sell shares");
                     out.println("AUTO_OFF - Disable automatic buy/sell shares");
                     out.println("");

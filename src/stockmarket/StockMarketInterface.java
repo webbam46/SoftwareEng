@@ -56,6 +56,13 @@ public class StockMarketInterface {
 		public double getAmount(){return amount;} public void setAmount(double value){ amount = value; }
 		//GET/SET price-per-share
 		public double getPricePerShare(){ return pricepershare; } public void setPricePerShare(double value){ pricepershare = value; }
+		//Used to display share info
+		public void Display(){
+			System.out.println("SHARE");
+			System.out.println("Company: " + company);
+			System.out.println("Amount: " + amount);
+			System.out.println("Price-per-Share: " + pricepershare);
+		}
 	}
 	//Contains owned shares
 	private ArrayList<Share> owned_shares = new ArrayList<Share>();
@@ -263,6 +270,8 @@ public class StockMarketInterface {
 				case "AUTO_ON": vu.Allow(true); Wait(1000); break;
 				//Auto off chosen
 				case "AUTO_OFF": vu.Allow(false); Wait(10000); break;
+				//Owned chosen
+				case "OWNED": this.Owned(); Wait(1000); break;
  			}
 		}
 	}
@@ -383,10 +392,37 @@ public class StockMarketInterface {
 		}catch(Exception e){ System.out.println("Error parsing input, unable to sell share"); }
 	}
 	public void Sell(String company,double amount){
-		//Write appropriate string to the client
-		client.Write(this.createToken(ServerInformation.SELL + ":" + company + ":" + Double.toString(amount)));
-		//Wait for response
-		Wait(1000);
+		
+		double price_per_share = vu.getPricePerShare(company);
+		
+		//We need to check if the user owns the share that they are trying to sell...
+		boolean valid = false;
+		for(int i = 0 ; i < owned_shares.size();i++){
+			if(owned_shares.get(i).getCompany().equals(company)){
+				double last_amount = owned_shares.get(i).getAmount();
+				System.out.println("last amount: " + last_amount);
+				if(amount <= last_amount && last_amount > 0){
+					
+				
+					double new_amount = last_amount - amount;
+					owned_shares.get(i).setAmount(new_amount);
+					owned_shares.get(i).setPricePerShare(price_per_share);
+					
+					if(new_amount == 0){
+						owned_shares.remove(i);
+					}
+					
+					valid = true;
+				}
+			}
+		}
+		
+		
+			//Write appropriate string to the client
+			if(valid  == true){client.Write(this.createToken(ServerInformation.SELL + ":" + company + ":" + Double.toString(amount)));
+			//Wait for response
+			Wait(1000);
+			}else{ System.out.println("Could not sell share"); }
 			
 	}
 	
@@ -415,6 +451,31 @@ public class StockMarketInterface {
 		Wait(1000);
 	}
 	
+	/**
+	 * Function is used to list owned shares
+	 */
+	public void Owned(){
+		
+		//Display a title
+		System.out.println("---------------");
+		System.out.println("OWNED SHARES");
+		System.out.println("---------------");
+		
+		//First check if the user owns any shares
+		if(this.owned_shares.isEmpty()){ System.out.println("You don't own any shares"); }
+		else
+		{
+			/*
+			 * Cycle through the owned_shares array
+			 */
+			for(int i = 0; i < this.owned_shares.size();i++){
+					//Display share
+				this.owned_shares.get(i).Display();
+			}
+		}
+		
+		System.out.println("---------------");
+	}
 	
 	/**
 	 * Get user input
